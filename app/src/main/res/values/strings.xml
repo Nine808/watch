@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">My one project</string>
-    <string name="hello_text">Привет, это моё первое приложение 🚀</string>
+    <string name="delete_alarm">Удалить будильник</string>
 </resources>

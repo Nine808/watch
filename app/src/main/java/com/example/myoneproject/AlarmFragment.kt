@@ -1,29 +1,26 @@
 package com.example.myoneproject
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import android.app.TimePickerDialog
-import java.util.Calendar
 
 class AlarmFragment : Fragment() {
 
+    private lateinit var storage: AlarmStorage
     private val alarms = mutableListOf<AlarmItem>()
     private lateinit var adapter: AlarmAdapter
-    private var nextId = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+
         val view = inflater.inflate(R.layout.fragment_alarm, container, false)
 
         val recycler = view.findViewById<RecyclerView>(R.id.alarm_list)
@@ -31,6 +28,7 @@ class AlarmFragment : Fragment() {
 
         adapter = AlarmAdapter(alarms) { alarm ->
             alarms.remove(alarm)
+            storage.save(alarms)
             adapter.notifyDataSetChanged()
         }
 
@@ -38,31 +36,31 @@ class AlarmFragment : Fragment() {
         recycler.adapter = adapter
 
         addButton.setOnClickListener {
-            showTimePicker()
+            addTestAlarm()
         }
-
 
         return view
     }
 
-    private fun showTimePicker() {
-        val calendar = Calendar.getInstance()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
+        storage = AlarmStorage(requireContext())
 
-        TimePickerDialog(
-            requireContext(),
-            { _, selectedHour, selectedMinute ->
+        alarms.clear()
+        alarms.addAll(storage.load())
+        adapter.notifyDataSetChanged()
+    }
 
-                val time = String.format("%02d:%02d", selectedHour, selectedMinute)
-                alarms.add(AlarmItem(nextId++, time))
-                adapter.notifyDataSetChanged()
-
-            },
-            hour,
-            minute,
-            true // 24-часовой формат
-        ).show()
+    private fun addTestAlarm() {
+        val newAlarm = AlarmItem(
+            id = System.currentTimeMillis().toInt(),
+            time = "07:30",
+            enabled = true
+        )
+        alarms.add(newAlarm)
+        storage.save(alarms)
+        adapter.notifyDataSetChanged()
     }
 }
+
