@@ -75,14 +75,13 @@ class AlarmService : Service() {
     }
 
 
-
-
     override fun onDestroy() {
         super.onDestroy()
 
         mediaPlayer?.stop()
         mediaPlayer?.release()
         mediaPlayer = null
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
