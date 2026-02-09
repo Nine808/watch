@@ -1,29 +1,52 @@
 package com.example.myoneproject
 
-import android.app.Service
+import android.app.*
 import android.content.Intent
-import android.media.MediaPlayer
-import android.os.IBinder
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.os.Build
+import android.os.*
 import androidx.core.app.NotificationCompat
 
 class AlarmService : Service() {
 
-    private var mediaPlayer: MediaPlayer? = null
+    private lateinit var wakeLock: PowerManager.WakeLock
 
     override fun onCreate() {
         super.onCreate()
 
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock = pm.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "AlarmApp::WakeLock"
+        )
+        wakeLock.acquire(10 * 60 * 1000L)
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
         startForeground(1, createNotification())
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.alarm_sound)
-        mediaPlayer?.isLooping = true
-        mediaPlayer?.start()
+        val alarmId = intent?.getIntExtra("ALARM_ID", -1) ?: -1
+        if (alarmId == -1) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+        // 🔥 запускаем экран будильника
+        val activityIntent = Intent(this, AlarmActivity::class.java).apply {
+            this.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("ALARM_ID", alarmId)
+        }
+        startActivity(activityIntent)
+
+        return START_NOT_STICKY
     }
+
+    override fun onDestroy() {
+        if (wakeLock.isHeld) wakeLock.release()
+        super.onDestroy()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
     private fun createNotification(): Notification {
 
         val channelId = "alarm_channel"
@@ -34,57 +57,31 @@ class AlarmService : Service() {
                 "Будильник",
                 NotificationManager.IMPORTANCE_HIGH
             )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+            getSystemService(NotificationManager::class.java)
+                .createNotificationChannel(channel)
         }
 
-        // Кнопка "Выключить"
-        val stopIntent = Intent(this, StopAlarmReceiver::class.java)
-        val stopPendingIntent = PendingIntent.getBroadcast(
-            this,
-            0,
-            stopIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // Кнопка "Отложить"
-        val snoozeIntent = Intent(this, SnoozeReceiver::class.java)
-        val snoozePendingIntent = PendingIntent.getBroadcast(
-            this,
-            1,
-            snoozeIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
         return NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_delete)
             .setContentTitle("Будильник")
             .setContentText("Звонит будильник")
-            .addAction(
-                R.drawable.ic_delete,
-                "Выключить",
-                stopPendingIntent
-            )
-            .addAction(
-                R.drawable.ic_launcher_foreground,
-                "Отложить на 10 мин",
-                snoozePendingIntent
-            )
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setFullScreenIntent(
+                PendingIntent.getActivity(
+                    this,
+                    0,
+                    Intent(this, AlarmActivity::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                ),
+                true
+            )
             .build()
     }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
-        mediaPlayer = null
-        super.onDestroy()
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
 }
+
+
+
+
+
+

@@ -1,57 +1,106 @@
 package com.example.myoneproject
 
 import android.content.Intent
-import android.os.Bundle
+import android.media.*
+import android.net.Uri
+import android.os.*
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
 class AlarmActivity : AppCompatActivity() {
+
+    private var mediaPlayer: MediaPlayer? = null
+    private var alarmId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 🔊 ЗАПУСКАЕМ ЗВУК СРАЗУ
-        val serviceIntent = Intent(this, AlarmService::class.java)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent)
+        // 🔓 экран поверх блокировки
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
         } else {
-            startService(serviceIntent)
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+            )
         }
 
-
-
-        // Показываем поверх блокировки
         window.addFlags(
-            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
         )
 
         setContentView(R.layout.activity_alarm)
 
-        val timeView = findViewById<TextView>(R.id.alarm_time)
-        val stopButton = findViewById<Button>(R.id.btn_stop)
-        val snoozeButton = findViewById<Button>(R.id.btn_snooze)
+        alarmId = intent.getIntExtra("ALARM_ID", -1)
 
-        val time = intent.getStringExtra("TIME") ?: "Будильник"
-        timeView.text = time
+        startAlarmSound()
+        setupButtons()
+    }
 
-        // ВЫКЛЮЧИТЬ
-        stopButton.setOnClickListener {
-            stopService(Intent(this, AlarmService::class.java))
-            finish()
+    // 🔘 кнопки
+    private fun setupButtons() {
+
+        findViewById<Button>(R.id.btnStop).setOnClickListener {
+            stopAlarm()
         }
 
-        // ОТЛОЖИТЬ НА 10 МИНУТ
-        snoozeButton.setOnClickListener {
-            stopService(Intent(this, AlarmService::class.java))
-
-            val snoozeIntent = Intent(this, SnoozeReceiver::class.java)
-            sendBroadcast(snoozeIntent)
-
-            finish()
+        findViewById<Button>(R.id.btnSnooze).setOnClickListener {
+            snoozeAlarm()
         }
     }
+
+    // 🔔 звук
+    private fun startAlarmSound() {
+        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+
+        mediaPlayer = MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+
+            setDataSource(
+                this@AlarmActivity,
+                Uri.parse("android.resource://${packageName}/${R.raw.alarm_sound}")
+            )
+
+            isLooping = true
+            prepare()
+            start()
+        }
+    }
+
+    // ⛔ выключить
+    private fun stopAlarm() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        stopService(Intent(this, AlarmService::class.java))
+        finish()
+    }
+
+    // ⏰ отложить на 10 минут (просто закрываем, планирование у тебя уже есть)
+    private fun snoozeAlarm() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        stopService(Intent(this, AlarmService::class.java))
+        finish()
+    }
+
+    override fun onDestroy() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        super.onDestroy()
+    }
 }
+
+
