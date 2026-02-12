@@ -1,9 +1,18 @@
-package com.example.myoneproject
+package com.example.myoneproject.system.alarm
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Context
 import android.content.Intent
-import android.os.*
+import android.os.Build
+import android.os.IBinder
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+import com.example.myoneproject.R
+import com.example.myoneproject.ui.alarm.AlarmActivity
 
 class AlarmService : Service() {
 
@@ -79,9 +88,3 @@ class AlarmService : Service() {
             .build()
     }
 }
-
-
-
-
-
-

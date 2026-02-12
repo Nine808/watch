@@ -1,10 +1,16 @@
 package com.example.myoneproject
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.myoneproject.ui.alarm.AlarmFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.Button
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -12,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
 
 
         val bottomNav =
@@ -45,4 +53,18 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.fragment_container, fragment)
             .commit()
     }
+    private fun createTimerChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "timer_channel",
+                "Timer Channel",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            channel.description = "Channel for timer"
+
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
 }

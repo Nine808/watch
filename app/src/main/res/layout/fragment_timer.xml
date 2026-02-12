@@ -5,14 +5,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- ВРЕМЯ -->
     <TextView
+        android:id="@+id/timerTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Экран таймера"
-        android:textSize="20sp"
+        android:text="02:00"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+       <!-- STOP -->
+    <ImageButton
+        android:id="@+id/stopButton"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/circle_button_bg"
+        android:src="@drawable/ic_stop"
+        app:tint="@android:color/black"
+        android:contentDescription="Stop"
+        app:layout_constraintTop_toBottomOf="@id/timerTextView"
+        app:layout_constraintEnd_toStartOf="@id/pauseButton"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="48dp"/>
+
+    <!-- PAUSE / PLAY -->
+    <ImageButton
+        android:id="@+id/pauseButton"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/circle_button_bg"
+        android:src="@drawable/ic_pause"
+        app:tint="@android:color/black"
+        android:contentDescription="Pause"
+        app:layout_constraintTop_toBottomOf="@id/timerTextView"
+        app:layout_constraintStart_toEndOf="@id/stopButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="48dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+

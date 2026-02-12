@@ -1,4 +1,4 @@
-package com.example.myoneproject
+package com.example.myoneproject.system.alarm
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import com.example.myoneproject.AlarmItem
+import com.example.myoneproject.ui.alarm.AlarmActivity
 import java.util.Calendar
 import java.util.Date
 
@@ -119,4 +121,3 @@ object AlarmScheduler {
         Log.d("ALARM_DEBUG", "AlarmId=${alarm.id} canceled")
     }
 }
-

@@ -2,23 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- permissions -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
-        android:label="My one project"
         android:icon="@mipmap/ic_launcher"
+        android:label="My one project"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyOneProject">
 
-        <!-- Главный экран -->
+        <!-- Main -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -28,44 +28,72 @@
             </intent-filter>
         </activity>
 
-        <!-- Экран будильника поверх блокировки -->
+        <!-- Таймер -->
         <activity
-            android:name=".AlarmActivity"
+            android:name=".TimerActivity"
             android:exported="false"
-            android:showWhenLocked="true"
-            android:turnScreenOn="true"
-            android:launchMode="singleTask" />
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop" />
 
-        <!-- Сервис проигрывания -->
+
+        <!-- 🔥 Экран "Время вышло" -->
+        <activity
+            android:name=".TimerExpiredActivity"
+            android:exported="false"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+
+
+        <activity
+            android:name=".ui.alarm.AlarmActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true" />
+
         <service
-            android:name=".AlarmService"
+            android:name=".system.alarm.AlarmService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
-        <!-- Приёмник срабатывания будильника -->
         <receiver
-            android:name=".AlarmReceiver"
-            android:exported="false" />
-
-        <!-- Кнопка "Выключить" -->
-        <receiver
-            android:name=".StopAlarmReceiver"
-            android:exported="false" />
-
-        <!-- Кнопка "Отложить" -->
-        <receiver
-            android:name=".SnoozeReceiver"
+            android:name=".system.alarm.AlarmReceiver"
             android:exported="false" />
 
         <receiver
-            android:name=".TimeChangeReceiver"
+            android:name=".system.alarm.StopAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".system.alarm.SnoozeReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".system.alarm.TimeChangeReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.TIME_CHANGED"/>
-                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
-                <action android:name="android.intent.action.DATE_CHANGED"/>
+                <action android:name="android.intent.action.TIME_CHANGED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <!-- Кнопка "Отключить таймер" -->
+        <receiver
+            android:name=".StopTimerReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".TimerExpiredReceiver"
+            android:exported="false" />
+
+        <service
+            android:name=".TimerForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"/>
 
 
     </application>

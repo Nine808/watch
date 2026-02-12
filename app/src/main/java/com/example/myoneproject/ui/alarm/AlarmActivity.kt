@@ -1,12 +1,17 @@
-package com.example.myoneproject
+package com.example.myoneproject.ui.alarm
 
 import android.content.Intent
-import android.media.*
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myoneproject.system.alarm.AlarmService
+import com.example.myoneproject.R
 
 class AlarmActivity : AppCompatActivity() {
 
@@ -102,5 +107,3 @@ class AlarmActivity : AppCompatActivity() {
         super.onDestroy()
     }
 }
-
-

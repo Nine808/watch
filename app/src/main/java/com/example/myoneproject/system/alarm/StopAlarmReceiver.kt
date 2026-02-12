@@ -1,4 +1,4 @@
-package com.example.myoneproject
+package com.example.myoneproject.system.alarm
 
 import android.content.BroadcastReceiver
 import android.content.Context

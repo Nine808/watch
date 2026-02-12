@@ -1,4 +1,4 @@
-package com.example.myoneproject
+package com.example.myoneproject.ui.alarm
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +7,9 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
-import java.util.Calendar   // ← ВАЖНО
+import com.example.myoneproject.AlarmItem
+import com.example.myoneproject.R
+import java.util.Calendar
 
 class AlarmAdapter(
     private val alarms: MutableList<AlarmItem>,
